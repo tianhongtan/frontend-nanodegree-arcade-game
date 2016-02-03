@@ -65,8 +65,17 @@ LeftEnemy.prototype.constructor = LeftEnemy;
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function () {
-    this.reset();
-    this.sprite = 'images/char-boy.png';
+    this.spriteArr = [
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
+        undefined];
+    this.resetPosition();
+    this.lives = 5;
+    this.points = 0;
+    this.sprite = this.spriteArr[0];
 };
 
 Player.prototype.update = function() {
@@ -74,14 +83,51 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    if (!this.gameEnded()) {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    } else if (this.lives == 0) {
+        ctx.save();
+        ctx.font = "64pt bold arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Game Over", canvas.width/2, canvas.height/2);
+        ctx.restore();
+    } else if (this.points == 5) {
+        ctx.save();
+        ctx.font = "64pt bold arial";
+        ctx.textAlign = "center";
+        ctx.fillText("You Win!!!", canvas.width/2, canvas.height/2);
+        ctx.restore();
+    }
+    this.renderLives();
+    this.renderPoints();
 };
 
-Player.prototype.reset = function() {
+Player.prototype.renderLives = function() {
+    for (var i = 0; i < this.lives; i++) {
+        ctx.drawImage(Resources.get('images/Heart.png'), 5*xBlockSize - i*50, yBlockSize + yOffset, 30, 30);
+    }
+};
+
+Player.prototype.renderPoints = function() {
+    for (var i = 0; i < this.points; i++) {
+        ctx.drawImage(Resources.get('images/Star.png'), i*50, yBlockSize + yOffset, 30, 30);
+    }
+};
+Player.prototype.resetPosition = function() {
     this.x = 2*xBlockSize;
     this.y = 5*yBlockSize + yOffset;
 };
 
+Player.prototype.die = function() {
+    console.log("lives left:" + this.lives);
+    this.lives --;
+    this.sprite = this.spriteArr[5-this.lives];
+    this.resetPosition();
+};
+
+Player.prototype.gameEnded = function() {
+    return this.lives == 0 || this.points == 5;
+};
 Player.prototype.handleInput = function(dir) {
     //handles direction input. Will not move if character attempts to move past boundaries.
     switch(dir) {
@@ -107,7 +153,8 @@ Player.prototype.handleInput = function(dir) {
 };
 
 Player.prototype.victory = function () {
-    this.reset();
+    this.resetPosition();
+    this.points++;
 };
 
 // Now instantiate your objects.

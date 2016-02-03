@@ -85,9 +85,10 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
-        checkCollisions();
-
+        if (!player.gameEnded()) {
+            updateEntities(dt);
+            checkCollisions();
+        }
     }
 
     /* This is called by the update function and loops through all of the
@@ -105,15 +106,15 @@ var Engine = (function(global) {
         });
         player.update();
 
-        //kill enemies once they've moved too far
+        //kill enemies once they've moved traveled across the map.
         allEnemies = allEnemies.filter(function(e) {
             return e.traveled < 8*xBlockSize;
         });
 
         //spawn additional enemies
         for (var i = 1; i < yCounts.length; i++) {
-            if (yCounts[i] == 0) {
-                var spawnCount = getRandBetween(1, 3);
+            if (yCounts[i] == 0 || (player.points >= 2 && yCounts[i] <= 2)) {
+                var spawnCount = getRandBetween(1, player.points + 2);
                 for (var j = 0; j < spawnCount; j++) {
                     allEnemies.push(new enemyTypes[getRandIntBetween(0, 1)](i));
                 }
@@ -134,7 +135,7 @@ var Engine = (function(global) {
             return e.x > playerXLeft && e.x < playerXRight && player.y == e.y;
         });
         if (collisions.length > 0) {
-            player.reset();
+            player.die();
         }
     }
     /* This function initially draws the "game level", it will then call
@@ -192,6 +193,7 @@ var Engine = (function(global) {
         });
 
         player.render();
+
     }
 
     /* This function does nothing but it could have been a good place to
@@ -212,7 +214,13 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/enemy-bug-left.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
+        'images/Heart.png',
+        'images/Star.png'
     ]);
     Resources.onReady(init);
 
@@ -221,4 +229,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.canvas = canvas;
 })(this);
