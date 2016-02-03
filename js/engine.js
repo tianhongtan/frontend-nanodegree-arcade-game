@@ -23,7 +23,8 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        totalTimeElapsed;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -53,6 +54,11 @@ var Engine = (function(global) {
          */
         lastTime = now;
 
+        /*
+         * Keep track of total time elapsed for tracking purposes.
+         */
+        totalTimeElapsed +=dt;
+
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
@@ -80,7 +86,8 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
+
     }
 
     /* This is called by the update function and loops through all of the
@@ -91,12 +98,45 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
+        var yCounts = [0, 0, 0, 0];
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
+            yCounts[(enemy.y-yOffset)/yBlockSize]++;
         });
         player.update();
+
+        //kill enemies once they've moved too far
+        allEnemies = allEnemies.filter(function(e) {
+            return e.traveled < 8*xBlockSize;
+        });
+
+        //spawn additional enemies
+        for (var i = 1; i < yCounts.length; i++) {
+            if (yCounts[i] == 0) {
+                var spawnCount = getRandBetween(1, 3);
+                for (var j = 0; j < spawnCount; j++) {
+                    allEnemies.push(new enemyTypes[getRandIntBetween(0, 1)](i));
+                }
+            }
+        }
     }
 
+    /**
+     * Performs "collision checking" based on the positions of the bugs and players.
+     */
+    function checkCollisions() {
+        var collisions = allEnemies.filter(function(e) {
+
+            var xBuffer = 9; //left or right size
+            var playerXLeft = player.x - xBlockSize/2 + xBuffer;
+            var playerXRight = player.x + xBlockSize/2 - xBuffer;
+
+            return e.x > playerXLeft && e.x < playerXRight && player.y == e.y;
+        });
+        if (collisions.length > 0) {
+            player.reset();
+        }
+    }
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
@@ -171,6 +211,7 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
+        'images/enemy-bug-left.png',
         'images/char-boy.png'
     ]);
     Resources.onReady(init);
