@@ -121,7 +121,6 @@ Player.prototype.resetPosition = function() {
 Player.prototype.die = function() {
     console.log("lives left:" + this.lives);
     this.lives --;
-    this.sprite = this.spriteArr[5-this.lives];
     this.resetPosition();
 };
 
@@ -155,6 +154,7 @@ Player.prototype.handleInput = function(dir) {
 Player.prototype.victory = function () {
     this.resetPosition();
     this.points++;
+    this.sprite = this.spriteArr[this.points];
 };
 
 // Now instantiate your objects.

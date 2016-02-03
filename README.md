@@ -1,6 +1,12 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this [rubric](https://www.udacity.com/course/viewer/#!/c-nd001/l-2696458597/m-2687128535) for self-checking their submission.
+BUGGER v 1.0
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+Open index.html to play the game!
+
+You play as a group of small children who all want to reach the river and run away the endless torrent of bugs.
+Be careful, if a child touches a bug, you will lose a life!
+
+You win when all 5 children reach the river.
+You lose when all your lives are gone.
